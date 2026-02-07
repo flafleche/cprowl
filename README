@@ -44,6 +44,28 @@ cprowl : prowl client
        1 : high
        2 : emergency
 
+Network Simulation (NEW)
+-----------------------
+
+This repository now includes tools for simulating network conditions between
+Docker containers. This is useful for testing applications under various
+network conditions (delay, packet loss, jitter, bandwidth limitations).
+
+See NETWORK_SIMULATION.md for detailed documentation.
+
+Quick start:
+  # Start containers
+  docker-compose up -d
+
+  # Apply network conditions
+  ./network-sim.sh -c cprowl-container1 -d 100ms -l 5%
+
+  # Test the conditions
+  ./test-network.sh
+
+  # Try example scenarios
+  ./examples.sh
+
 License
 -------
 

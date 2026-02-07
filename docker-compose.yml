@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Container 1: Acts as a server/receiver
+  container1:
+    image: alpine:latest
+    container_name: cprowl-container1
+    command: sh -c "apk add --no-cache iproute2 iperf3 curl && tail -f /dev/null"
+    networks:
+      - cprowl-network
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    hostname: container1
+
+  # Container 2: Acts as a client/sender
+  container2:
+    image: alpine:latest
+    container_name: cprowl-container2
+    command: sh -c "apk add --no-cache iproute2 iperf3 curl && tail -f /dev/null"
+    networks:
+      - cprowl-network
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    hostname: container2
+    depends_on:
+      - container1
+
+networks:
+  cprowl-network:
+    driver: bridge
+    name: cprowl-network
