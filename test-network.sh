@@ -51,8 +51,15 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}Test 1: Basic Connectivity${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
+# Get container IPs
+CONTAINER1_IP=$(docker exec ${CONTAINER1} hostname -i | tr -d ' \n')
+CONTAINER2_IP=$(docker exec ${CONTAINER2} hostname -i | tr -d ' \n')
+
+echo -e "${YELLOW}Container1 IP: ${CONTAINER1_IP}${NC}"
+echo -e "${YELLOW}Container2 IP: ${CONTAINER2_IP}${NC}\n"
+
 run_test "Ping from container2 to container1 (5 packets)" \
-    "docker exec ${CONTAINER2} ping -c 5 container1"
+    "docker exec ${CONTAINER2} ping -c 5 ${CONTAINER1_IP}"
 
 # Test 2: Show current tc rules
 echo -e "${BLUE}========================================${NC}"
@@ -73,7 +80,7 @@ echo -e "${BLUE}Test 3: Baseline Latency Measurement${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
 run_test "Measure baseline RTT (Round Trip Time)" \
-    "docker exec ${CONTAINER2} ping -c 10 -q container1 | tail -1"
+    "docker exec ${CONTAINER2} ping -c 10 -q ${CONTAINER1_IP} | tail -1"
 
 # Test 4: HTTP connectivity test
 echo -e "${BLUE}========================================${NC}"
@@ -81,11 +88,11 @@ echo -e "${BLUE}Test 4: HTTP Connectivity${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
 # Start a simple HTTP server on container1
-docker exec -d ${CONTAINER1} sh -c "echo 'HTTP/1.1 200 OK\r\nContent-Length: 23\r\n\r\nHello from container1!' | nc -l -p 8080" 2>/dev/null || true
+docker exec -d ${CONTAINER1} sh -c "while true; do echo 'HTTP/1.1 200 OK\r\nContent-Length: 23\r\n\r\nHello from container1!' | nc -l -p 8080; done" 2>/dev/null || true
 sleep 2
 
 run_test "HTTP request from container2 to container1" \
-    "docker exec ${CONTAINER2} sh -c 'curl -m 5 http://container1:8080 2>/dev/null || echo \"Connection failed\"'"
+    "docker exec ${CONTAINER2} sh -c 'curl -m 5 http://${CONTAINER1_IP}:8080 2>/dev/null || echo \"Connection failed\"'"
 
 # Test 5: Network statistics
 echo -e "${BLUE}========================================${NC}"
@@ -110,7 +117,7 @@ echo -e "${YELLOW}Applying 100ms delay to container1...${NC}"
 echo ""
 
 echo -e "${YELLOW}Testing with delay (expect ~100ms RTT):${NC}"
-docker exec ${CONTAINER2} ping -c 5 container1
+docker exec ${CONTAINER2} ping -c 5 ${CONTAINER1_IP}
 echo ""
 
 echo -e "${YELLOW}Removing network conditions...${NC}"

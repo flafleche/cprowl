@@ -14,6 +14,12 @@ NC='\033[0m'
 CONTAINER1="cprowl-container1"
 CONTAINER2="cprowl-container2"
 
+# Get container IPs
+get_container_ips() {
+    CONTAINER1_IP=$(docker exec ${CONTAINER1} hostname -i | tr -d ' \n' 2>/dev/null) || CONTAINER1_IP=""
+    CONTAINER2_IP=$(docker exec ${CONTAINER2} hostname -i | tr -d ' \n' 2>/dev/null) || CONTAINER2_IP=""
+}
+
 echo -e "${BLUE}================================================${NC}"
 echo -e "${BLUE}Network Simulation Example Scenarios${NC}"
 echo -e "${BLUE}================================================${NC}\n"
@@ -33,7 +39,8 @@ run_scenario() {
     "$@"
     
     echo -e "\n${BLUE}Testing scenario...${NC}"
-    docker exec ${CONTAINER2} ping -c 3 container1
+    get_container_ips
+    docker exec ${CONTAINER2} ping -c 3 ${CONTAINER1_IP}
     
     echo -e "\n${YELLOW}Press Enter to continue to next scenario (or Ctrl+C to exit)...${NC}"
     read
@@ -113,10 +120,11 @@ echo -e "${YELLOW}Both directions have delays and packet loss${NC}\n"
 
 echo -e "\n${BLUE}Testing bidirectional scenario...${NC}"
 echo -e "${YELLOW}Ping from container2 to container1:${NC}"
-docker exec ${CONTAINER2} ping -c 3 container1
+get_container_ips
+docker exec ${CONTAINER2} ping -c 3 ${CONTAINER1_IP}
 
 echo -e "\n${YELLOW}Ping from container1 to container2:${NC}"
-docker exec ${CONTAINER1} ping -c 3 container2
+docker exec ${CONTAINER1} ping -c 3 ${CONTAINER2_IP}
 
 echo -e "\n${YELLOW}Press Enter to finish...${NC}"
 read
