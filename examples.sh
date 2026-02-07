@@ -18,6 +18,13 @@ CONTAINER2="cprowl-container2"
 get_container_ips() {
     CONTAINER1_IP=$(docker exec ${CONTAINER1} hostname -i | tr -d ' \n' 2>/dev/null) || CONTAINER1_IP=""
     CONTAINER2_IP=$(docker exec ${CONTAINER2} hostname -i | tr -d ' \n' 2>/dev/null) || CONTAINER2_IP=""
+    
+    # Validate IPs were obtained
+    if [ -z "$CONTAINER1_IP" ] || [ -z "$CONTAINER2_IP" ]; then
+        echo -e "${RED}Error: Failed to get container IP addresses${NC}"
+        echo -e "${YELLOW}Make sure containers are running: docker compose ps${NC}"
+        exit 1
+    fi
 }
 
 echo -e "${BLUE}================================================${NC}"

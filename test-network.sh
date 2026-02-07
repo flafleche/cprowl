@@ -87,12 +87,15 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}Test 4: HTTP Connectivity${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
-# Start a simple HTTP server on container1
+# Start a simple HTTP server on container1 (will be cleaned up automatically when container stops)
+echo -e "${YELLOW}Starting HTTP server on container1:8080...${NC}"
 docker exec -d ${CONTAINER1} sh -c "while true; do echo 'HTTP/1.1 200 OK\r\nContent-Length: 23\r\n\r\nHello from container1!' | nc -l -p 8080; done" 2>/dev/null || true
 sleep 2
 
 run_test "HTTP request from container2 to container1" \
     "docker exec ${CONTAINER2} sh -c 'curl -m 5 http://${CONTAINER1_IP}:8080 2>/dev/null || echo \"Connection failed\"'"
+
+# Note: HTTP server will be cleaned up when containers are stopped
 
 # Test 5: Network statistics
 echo -e "${BLUE}========================================${NC}"

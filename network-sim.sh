@@ -100,9 +100,13 @@ add_network_conditions() {
     fi
     
     # Add jitter
-    if [ "$JITTER" != "0ms" ] && [ "$DELAY" != "0ms" ]; then
-        TC_CMD="$TC_CMD $JITTER"
-        echo -e "  ${YELLOW}Jitter: $JITTER${NC}"
+    if [ "$JITTER" != "0ms" ]; then
+        if [ "$DELAY" != "0ms" ]; then
+            TC_CMD="$TC_CMD $JITTER"
+            echo -e "  ${YELLOW}Jitter: $JITTER${NC}"
+        else
+            echo -e "  ${RED}Warning: Jitter requires delay to be set. Ignoring jitter.${NC}"
+        fi
     fi
     
     # Add packet loss
