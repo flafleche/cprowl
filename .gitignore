@@ -1,0 +1,26 @@
+# Build artifacts
+build/
+*.o
+*.so
+*.a
+cprowl
+cprowl_config.h
+.lock-waf*
+.waf-*
+Dockerfile
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+*.tmp
+/tmp/

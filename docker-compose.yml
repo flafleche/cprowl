@@ -1,0 +1,31 @@
+services:
+  # Container 1: Acts as a server/receiver  
+  container1:
+    image: nicolaka/netshoot:latest
+    container_name: cprowl-container1
+    command: sleep infinity
+    networks:
+      - cprowl-network
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    hostname: container1
+
+  # Container 2: Acts as a client/sender
+  container2:
+    image: nicolaka/netshoot:latest
+    container_name: cprowl-container2
+    command: sleep infinity
+    networks:
+      - cprowl-network
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+    hostname: container2
+    depends_on:
+      - container1
+
+networks:
+  cprowl-network:
+    driver: bridge
+    name: cprowl-network
